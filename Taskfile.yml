@@ -1,0 +1,17 @@
+version: '3'
+
+tasks:
+  install:
+    cmds:
+      - |
+        mvn install && \
+        mvn --file pom.xml install
+  release:
+    cmds:
+      - |
+        export NEXT_VERSION
+        NEXT_VERSION=$(git cliff --bumped-version | tr -d 'v');
+        echo "Next version: $NEXT_VERSION"
+        mvn \
+          versions:set -DnewVersion=${NEXT_VERSION} \
+          versions:commit
