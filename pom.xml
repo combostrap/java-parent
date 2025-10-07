@@ -56,6 +56,10 @@
         <maven.release.plugin.version>3.1.1</maven.release.plugin.version>
         <!-- https://mvnrepository.com/artifact/org.codehaus.mojo/exec-maven-plugin -->
         <maven.exec.plugin.version>3.5.0</maven.exec.plugin.version>
+
+        <!-- https://github.com/git-commit-id/git-commit-id-maven-plugin/releases -->
+        <maven.git.plugin.version>9.0.2</maven.git.plugin.version>
+
     </properties>
 
 
@@ -133,6 +137,33 @@
                                         <Maven-Group-Id>${project.groupId}</Maven-Group-Id>
                                         <Maven-Artifact-Id>${project.artifactId}</Maven-Artifact-Id>
                                         <Maven-Version>${project.version}</Maven-Version>
+                                        <Package-Version>${project.version}</Package-Version>
+                                        <!-- Add the Git and build info -->
+                                        <!-- https://github.com/git-commit-id/git-commit-id-maven-plugin/blob/master/docs/configuration-and-properties.md -->
+                                        <!-- https://github.com/git-commit-id/git-commit-id-plugin-core/blob/master/src/main/java/pl/project13/core/GitCommitPropertyConstant.java -->
+                                        <!-- Property are immutable so we can't set them and the IDE is not happy, we silence the warning -->
+                                        <!--suppress MavenModelInspection -->
+                                        <Build-Time>${git.build.time}</Build-Time>
+                                        <!--suppress MavenModelInspection -->
+                                        <Build-Host>${git.build.host}</Build-Host>
+                                        <!--suppress MavenModelInspection -->
+                                        <Git-Branch>${git.branch}</Git-Branch>
+                                        <!--suppress MavenModelInspection -->
+                                        <Git-Dirty>${git.dirty}</Git-Dirty>
+                                        <!--suppress MavenModelInspection -->
+                                        <Git-Commit-Id>${git.commit.id}</Git-Commit-Id>
+                                        <!--suppress MavenModelInspection -->
+                                        <Git-Commit-Id-Abbrev>${git.commit.id.abbrev}</Git-Commit-Id-Abbrev>
+                                        <!--suppress MavenModelInspection -->
+                                        <Git-Commit-Id-Describe>${git.commit.id.describe}</Git-Commit-Id-Describe>
+                                        <!--suppress MavenModelInspection -->
+                                        <Git-Commit-Id-Describe-short>${git.commit.id.describe-short}</Git-Commit-Id-Describe-short>
+                                        <!--suppress MavenModelInspection -->
+                                        <Git-User-name>${git.build.user.name}</Git-User-name>
+                                        <!--suppress MavenModelInspection -->
+                                        <Git-User-email>${git.build.user.email}</Git-User-email>
+                                        <!--suppress MavenModelInspection -->
+                                        <Git-Build-Version>${git.build.version}</Git-Build-Version>
                                     </manifestEntries>
                                 </archive>
                                 <!-- Remove examples and native-image -->
@@ -251,6 +282,28 @@
             </plugins>
         </pluginManagement>
         <plugins>
+            <plugin>
+                <!-- Git Injection -->
+                <!-- https://github.com/git-commit-id/git-commit-id-maven-plugin -->
+                <groupId>io.github.git-commit-id</groupId>
+                <artifactId>git-commit-id-maven-plugin</artifactId>
+                <version>${maven.git.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>get-the-git-infos</id>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                        <!-- Binds to the initialize phase by default, so that all git properties are available -->
+                        <phase>initialize</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <skipPoms>false</skipPoms>
+                    <!-- Inject the properties in all pom -->
+                    <injectAllReactorProjects>true</injectAllReactorProjects>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
