@@ -337,6 +337,8 @@
                     <skipPoms>false</skipPoms>
                     <!-- Inject the properties in all pom -->
                     <injectAllReactorProjects>true</injectAllReactorProjects>
+                    <!-- Use native git because git.tag was blank -->
+                    <useNativeGit>true</useNativeGit>
                 </configuration>
             </plugin>
             <plugin>
