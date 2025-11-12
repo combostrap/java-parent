@@ -13,15 +13,15 @@
         <version>9</version>
     </parent>
 
-    <groupId>com.eraldy</groupId>
-    <artifactId>eraldy-parent</artifactId>
+    <groupId>com.combostrap</groupId>
+    <artifactId>combostrap-parent</artifactId>
     <version>0.1.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>Eraldy Parent pom</name>
+    <name>Combostrap Parent Pom</name>
 
     <organization>
-        <name>Eraldy</name>
+        <name>combostrap</name>
     </organization>
 
 
