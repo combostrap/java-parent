@@ -19,11 +19,43 @@
     <packaging>pom</packaging>
 
     <name>Combostrap Parent Pom</name>
+    <description>Combostrap Java Parent Pom</description>
+    <url>https://github.com/combostrap/java-parent</url>
 
     <organization>
         <name>combostrap</name>
     </organization>
 
+    <repositories>
+        <!--
+        Should stay empty otherwise you get an error in maven central
+        Why?
+        Dependencies must be resolvable from Maven Central itself because external repositories could serve malicious artifacts or be compromised
+        If needed, repositories definition should be in the local settings.xml file
+        -->
+    </repositories>
+
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>combostrap.com</id>
+            <name>Combostrap Project Contributors</name>
+            <url>https://www.combostrap.com</url>
+            <organization>Combostrap</organization>
+            <organizationUrl>https://www.combostrap.com</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/combostrap/java-parent.git</connection>
+        <url>https://github.com/combostrap/java-parent</url>
+    </scm>
 
     <properties>
 
@@ -40,7 +72,6 @@
         <maven.source.plugin.version>3.3.1</maven.source.plugin.version>
         <maven.resource.plugin.version>3.3.1</maven.resource.plugin.version>
         <maven.javadoc.plugin.version>3.7.0</maven.javadoc.plugin.version>
-        <maven.gpg.plugin.version>3.2.4</maven.gpg.plugin.version>
         <maven.dependency.plugin.version>3.7.0</maven.dependency.plugin.version>
         <maven.clean.plugin.version>3.3.2</maven.clean.plugin.version>
         <maven.deploy.plugin.version>3.1.2</maven.deploy.plugin.version>
@@ -62,27 +93,35 @@
         <!-- https://github.com/git-commit-id/git-commit-id-maven-plugin/releases -->
         <maven.git.plugin.version>9.0.2</maven.git.plugin.version>
 
+        <!-- Publication / Deployment -->
+        <maven.central.publishing.maven.plugin.version>0.7.0</maven.central.publishing.maven.plugin.version>
+        <sonatype.snapshotRepository>https://central.sonatype.com/repository/maven-snapshots/
+        </sonatype.snapshotRepository>
+        <sonatype.central.serverId>central</sonatype.central.serverId>
+        <sonatype.central.url>https://central.sonatype.com</sonatype.central.url>
+        <sonatype.central.url.api>${sonatype.central.url}/api/v1/publisher</sonatype.central.url.api>
+        <jreleaser.version>1.21.0</jreleaser.version>
+        <!-- staging repo value used at multiple place : https://jreleaser.org/guide/latest/examples/maven/staging-artifacts.html -->
+        <jreleaser.staging-repo>target/staging-deploy</jreleaser.staging-repo>
+
+
     </properties>
 
 
-    <repositories>
-        <!-- jitpack.io reports a warning when it can't download an artifact -->
-        <!-- we put central first and jitpack last so that we don't get confused by this warning        -->
+    <distributionManagement>
+        <!-- https://central.sonatype.org/publish/publish-portal-maven/#centralsnapshotsurl -->
+        <snapshotRepository>
+            <id>combostrap-snapshots-repository</id>
+            <name>Combostrap Snapshots Repository</name>
+            <url>${sonatype.snapshotRepository}</url>
+        </snapshotRepository>
+        <!-- Maven Central Repository through the OSSRH hosting project -->
         <repository>
-            <id>central</id>
-            <name>Central Repository</name>
-            <url>https://repo.maven.apache.org/maven2</url>
-            <layout>default</layout>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
+            <id>ossrh</id>
+            <name>Central Repository OSSRH</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-    </repositories>
-
+    </distributionManagement>
 
     <build>
         <pluginManagement>
@@ -372,8 +411,95 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- Ref: https://jreleaser.org/guide/latest/examples/maven/maven-central.html#_maven -->
+            <plugin>
+                <groupId>org.jreleaser</groupId>
+                <artifactId>jreleaser-maven-plugin</artifactId>
+                <version>${jreleaser.version}</version>
+                <inherited>false</inherited>
+                <configuration>
+                    <jreleaser>
+                        <!-- https://jreleaser.org/guide/latest/reference/signing.html -->
+                        <signing>
+                            <active>ALWAYS</active>
+                            <mode>COMMAND</mode>
+                            <armored>true</armored>
+                            <command>
+                                <keyName>1C43E1FE21F4DF4F</keyName>
+                            </command>
+                        </signing>
+                        <deploy>
+                            <maven>
+                                <mavenCentral>
+                                    <sonatype>
+                                        <active>RELEASE</active>
+                                        <url>${sonatype.central.url.api}</url>
+                                        <stagingRepositories>${jreleaser.staging-repo}</stagingRepositories>
+                                    </sonatype>
+                                </mavenCentral>
+                                <!-- For Snapshot -->
+                                <nexus2>
+                                    <snapshot-deploy>
+                                        <active>SNAPSHOT</active>
+                                        <snapshotUrl>https://central.sonatype.com/repository/maven-snapshots/</snapshotUrl>
+                                        <applyMavenCentralRules>true</applyMavenCentralRules>
+                                        <snapshotSupported>true</snapshotSupported>
+                                        <closeRepository>true</closeRepository>
+                                        <releaseRepository>true</releaseRepository>
+                                        <stagingRepositories>${jreleaser.staging-repo}</stagingRepositories>
+                                    </snapshot-deploy>
+                                </nexus2>
+                            </maven>
+                        </deploy>
+                    </jreleaser>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
+
+    <profiles>
+        <profile>
+            <id>publication</id>
+            <properties>
+                <altDeploymentRepository>local::file:./${jreleaser.staging-repo}</altDeploymentRepository>
+            </properties>
+            <build>
+                <defaultGoal>deploy</defaultGoal>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <attach>true</attach>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <attach>true</attach>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

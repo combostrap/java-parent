@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+set -TCEeuo pipefail
+
+# ref
+# https://jreleaser.org/guide/latest/examples/maven/maven-central.html#_maven
+
+export JRELEASER_MAVENCENTRAL_USERNAME
+JRELEASER_MAVENCENTRAL_USERNAME=$(pass combostrap/maven-sonatype/username)
+
+export JRELEASER_MAVENCENTRAL_PASSWORD
+JRELEASER_MAVENCENTRAL_PASSWORD=$(pass combostrap/maven-sonatype/password)
+
+export JRELEASER_GPG_PASSPHRASE
+JRELEASER_GPG_PASSPHRASE=$(pass combostrap/gpg/software-signing-key-passphrase)
+
+export JRELEASER_GITHUB_TOKEN
+JRELEASER_GITHUB_TOKEN=$(pass combostrap/github/release-token)
+
+# For snapshot
+export JRELEASER_NEXUS2_USERNAME="${JRELEASER_MAVENCENTRAL_USERNAME}"
+export JRELEASER_NEXUS2_PASSWORD="${JRELEASER_MAVENCENTRAL_PASSWORD}"
+
+# Verify
+# mvn --quiet jreleaser:config
+
+# mvn deploy -P publication
+
+"$PROJECT_ROOT/mvnw" "$@"
