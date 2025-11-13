@@ -15,7 +15,7 @@
 
     <groupId>com.combostrap</groupId>
     <artifactId>combostrap-parent</artifactId>
-    <version>0.1.2</version>
+    <version>0.1.3-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Combostrap Parent Pom</name>
@@ -440,6 +440,11 @@
                                         <active>RELEASE</active>
                                         <url>${sonatype.central.url.api}</url>
                                         <stagingRepositories>${jreleaser.staging-repo}</stagingRepositories>
+                                        <!-- JReleaser continue only if the status is published -->
+                                        <!-- Status may take a long time to get the published status -->
+                                        <!-- Max 1 minute wait: 5x12=60 seconds -->
+                                        <retryDelay>5</retryDelay>
+                                        <maxRetries>12</maxRetries>
                                     </sonatype>
                                 </mavenCentral>
                                 <!-- For Snapshot -->

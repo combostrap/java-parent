@@ -6,10 +6,27 @@ tasks:
       - |
         mvn install && \
         mvn --file pom.xml install
-  release:
+  # Create a release commit
+  release-commit:
+    cmds:
+      - |        
+        set -TCEeuo pipefail
+        
+        export NEXT_VERSION=$(yq --exit-status '.project.version' pom.xml | sed 's/-SNAPSHOT$//')
+        
+        ./mvnw versions:set -DgenerateBackupPoms=false -DnewVersion=$NEXT_VERSION
+        
+        git commit -am "chore(release): $NEXT_VERSION"
+        git push origin
+  # Create a snapshot commit
+  snapshot-commit:
     cmds:
       - |
-        export NEXT_VERSION
-        NEXT_VERSION=$(git cliff --bumped-version | tr -d 'v');
-        echo "Next version: $NEXT_VERSION"
-        xq -x '.project.parent.version = "$NEXT_VERSION"' pom.xml
+        set -TCEeuo pipefail
+        
+        ./mvnw versions:set -DgenerateBackupPoms=false -DnextSnapshot=true 
+        # manually mvnw versions:set -DgenerateBackupPoms=false -DnewVersion=x.y.z-SNAPSHOT
+        
+        NEXT_VERSION=$(yq --exit-status '.project.version' pom.xml)
+        git commit -am "chore(next): $NEXT_VERSION"
+        git push origin
