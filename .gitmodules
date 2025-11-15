@@ -1,3 +1,0 @@
-[submodule "repo-scripts"]
-	path = .repo-scripts
-	url = https://github.com/combostrap/repo-scripts.git
