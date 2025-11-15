@@ -107,6 +107,9 @@
         <!-- No test jar by default published -->
         <skip.test.jar>true</skip.test.jar>
 
+        <!-- pgp signing key name -->
+        <pgp.signing.key.name>1C43E1FE21F4DF4F</pgp.signing.key.name>
+
     </properties>
 
 
@@ -429,7 +432,7 @@
                             <mode>COMMAND</mode>
                             <armored>true</armored>
                             <command>
-                                <keyName>1C43E1FE21F4DF4F</keyName>
+                                <keyName>${pgp.signing.key.name}</keyName>
                             </command>
                         </signing>
                         <deploy>
