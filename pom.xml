@@ -1,8 +1,6 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <!-- https://repo1.maven.org/maven2/org/sonatype/oss/oss-parent/9/oss-parent-9.pom -->
@@ -106,6 +104,9 @@
 
         <!-- No test jar by default published -->
         <skip.test.jar>true</skip.test.jar>
+
+        <!-- pgp signing key name -->
+        <pgp.signing.key.name>1C43E1FE21F4DF4F</pgp.signing.key.name>
 
     </properties>
 
@@ -429,7 +430,7 @@
                             <mode>COMMAND</mode>
                             <armored>true</armored>
                             <command>
-                                <keyName>1C43E1FE21F4DF4F</keyName>
+                                <keyName>${pgp.signing.key.name}</keyName>
                             </command>
                         </signing>
                         <deploy>
@@ -452,7 +453,8 @@
                                 <nexus2>
                                     <snapshot-deploy>
                                         <active>SNAPSHOT</active>
-                                        <snapshotUrl>https://central.sonatype.com/repository/maven-snapshots/</snapshotUrl>
+                                        <snapshotUrl>https://central.sonatype.com/repository/maven-snapshots/
+                                        </snapshotUrl>
                                         <applyMavenCentralRules>true</applyMavenCentralRules>
                                         <snapshotSupported>true</snapshotSupported>
                                         <closeRepository>true</closeRepository>
