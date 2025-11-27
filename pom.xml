@@ -18,7 +18,7 @@
 
   <name>Combostrap Parent Pom</name>
   <description>Combostrap Java Parent Pom</description>
-  <url>https://github.com/combostrap/java-parent</url>
+  <url>https://github.com/combostrap/comboj-parent</url>
 
   <organization>
     <name>combostrap</name>
