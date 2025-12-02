@@ -102,7 +102,7 @@
     <sonatype.central.url.api>${sonatype.central.url}/api/v1/publisher</sonatype.central.url.api>
     <jreleaser.version>1.21.0</jreleaser.version>
     <!-- staging repo value used at multiple place : https://jreleaser.org/guide/latest/examples/maven/staging-artifacts.html -->
-    <jreleaser.staging-repo>target/staging-deploy</jreleaser.staging-repo>
+    <jreleaser.staging-repo>${project.build.directory}/staging-deploy</jreleaser.staging-repo>
 
     <!-- No test jar by default published -->
     <skip.test.jar>true</skip.test.jar>
